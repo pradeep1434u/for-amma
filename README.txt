@@ -1,19 +1,7 @@
-DHAMMA DAILY
+Dhamma Daily v6
 
-A simple installable PWA for a daily Dhamma thought.
+Upload index.html, sw.js, manifest.json, icon.png and icon.svg to the GitHub Pages repository, replacing the existing files.
 
-LIVE DATA
-The app reads your published Google Sheet CSV. You can edit the sheet and the app will fetch the updated collection when opened/refreshed.
+Important: the app reads the published Google Sheet CSV. Dates are normalized by month/day, so a thought dated 2026-10-03 also matches October 3 in future years.
 
-SHEET FORMAT
-Date | Quote | Section | Author (optional)
-
-Dates can be entered with or without a year. The app matches the month and day, so a thought for 3 October will repeat every year without requiring you to change the year.
-
-INSTALL
-1. Deploy these files to a static host such as GitHub Pages.
-2. Open the site in Chrome on the phone.
-3. Use Chrome's Add to Home screen / Install app option.
-
-IMPORTANT PRIVACY NOTE
-Because the app reads a published Google Sheet CSV directly, the sheet data is publicly readable. Do not put sensitive or private information in the sheet.
+After replacing files, open the GitHub Pages URL in Chrome and hard refresh. If the installed PWA still shows the old version, uninstall the old Dhamma Daily PWA and install it again.

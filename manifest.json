@@ -1,18 +1,1 @@
-{
-  "name": "Dhamma Daily",
-  "short_name": "Dhamma Daily",
-  "description": "A little Dhamma thought for every day.",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "background_color": "#fbf4e8",
-  "theme_color": "#F5E7D0",
-  "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
+{"name":"Dhamma Daily","short_name":"Dhamma Daily","description":"A little Dhamma thought for every day.","start_url":"./","scope":"./","display":"standalone","background_color":"#fbf4e8","theme_color":"#F5E7D0","icons":[{"src":"icon.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
