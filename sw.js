@@ -1,5 +1,5 @@
-const CACHE = "dhamma-daily-v2";
-const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
+const CACHE = "dhamma-daily-v3";
+const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.png", "./icon.svg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });

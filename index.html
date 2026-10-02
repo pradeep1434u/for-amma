@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#F5E7D0">
   <meta name="description" content="A daily collection of thoughts, wisdom and love for Amma.">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icon.png" type="image/png">
   <title>Dhamma Daily</title>
   <style>
     :root{--bg:#fbf4e8;--card:#fffaf2;--ink:#3d342a;--muted:#786e62;--accent:#a56b35;--line:#eadcc8;--soft:#f1e2cc}
@@ -146,9 +146,19 @@ function renderLists(){
   const days=document.getElementById("daysList");
   days.innerHTML=quotes.map((q,i)=>`<div class="item" onclick="openQuote(${i})"><div class="item-date">${esc(niceDate(q.date))}</div><div class="item-text">${esc(q.quote.slice(0,150))}${q.quote.length>150?"…":""}</div><div class="item-section">${esc(q.section||"")}</div></div>`).join("");
   const counts={}; quotes.forEach(q=>counts[q.section||"Other"]=(counts[q.section||"Other"]||0)+1);
-  document.getElementById("sectionList").innerHTML=Object.entries(counts).sort().map(([s,n])=>`<button class="chip" onclick="showSection(${JSON.stringify(s)})"><b>${esc(s)}</b><span>${n} ${n===1?"thought":"thoughts"}</span></button>`).join("");
+  const sectionList=document.getElementById("sectionList");
+sectionList.innerHTML="";
+Object.entries(counts).sort().forEach(([s,n])=>{
+  const b=document.createElement("button");
+  b.className="chip";
+  b.type="button";
+  b.innerHTML=`<b>${esc(s)}</b><span>${n} ${n===1?"thought":"thoughts"}</span>`;
+  b.addEventListener("click",()=>showSection(s));
+  sectionList.appendChild(b);
+});
 }
 function showSection(s){
+  showPage("sections");
   const arr=quotes.map((q,i)=>({q,i})).filter(x=>(x.q.section||"Other")===s);
   document.getElementById("sectionBrowse").classList.add("hidden");
   document.getElementById("sectionResults").classList.remove("hidden");
