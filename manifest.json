@@ -1,0 +1,17 @@
+{
+  "name": "For Amma",
+  "short_name": "For Amma",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fbf4e8",
+  "theme_color": "#f5e7d0",
+  "description": "A daily collection of thoughts, wisdom and love for Amma.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

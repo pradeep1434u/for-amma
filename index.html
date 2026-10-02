@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#F5E7D0">
+  <meta name="description" content="A daily collection of thoughts, wisdom and love for Amma.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>For Amma</title>
+  <style>
+    :root{--bg:#fbf4e8;--card:#fffaf2;--ink:#3d342a;--muted:#786e62;--accent:#a56b35;--line:#eadcc8;--soft:#f1e2cc}
+    *{box-sizing:border-box} html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{padding-bottom:84px}.app{max-width:720px;margin:auto;padding:20px 18px}
+    header{padding:12px 4px 18px}.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+    h1{font-family:Georgia,serif;font-size:36px;line-height:1.05;margin:7px 0 5px;font-weight:500}.sub{color:var(--muted);font-size:14px}
+    .hero{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:28px 24px;box-shadow:0 10px 30px #6b51351a}
+    .date{font-size:13px;color:var(--accent);font-weight:700;margin-bottom:22px}
+    .quote{font-family:Georgia,serif;font-size:25px;line-height:1.55;white-space:pre-wrap}
+    .author{margin-top:20px;color:var(--muted);font-size:14px}
+    .actions{display:flex;gap:10px;margin-top:24px}.btn{border:1px solid var(--line);background:var(--soft);color:var(--ink);padding:11px 15px;border-radius:14px;font-weight:650;cursor:pointer}
+    .btn.primary{background:var(--accent);color:white;border-color:var(--accent)}.btn:disabled{opacity:.45}
+    .section{margin-top:28px}.section h2{font-family:Georgia,serif;font-size:23px;font-weight:500;margin:0 0 14px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.chip{padding:15px;border:1px solid var(--line);background:var(--card);border-radius:17px;text-align:left;cursor:pointer;color:var(--ink)}
+    .chip b{display:block;font-size:15px}.chip span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+    .list{display:flex;flex-direction:column;gap:10px}.item{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;cursor:pointer}
+    .item-date{font-size:12px;color:var(--accent);font-weight:700}.item-text{margin-top:6px;line-height:1.45}.item-section{font-size:11px;color:var(--muted);margin-top:8px}
+    .status{padding:18px;border-radius:18px;background:var(--soft);color:var(--muted);line-height:1.5}
+    nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fffaf2ee;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px max(14px,calc((100vw - 720px)/2 + 14px));display:flex;justify-content:space-around}
+    nav button{border:0;background:none;color:var(--muted);font-size:12px;padding:6px 12px;cursor:pointer}nav button.active{color:var(--accent);font-weight:800}
+    .small{font-size:12px;color:var(--muted)}.hidden{display:none!important}
+    @media(min-width:600px){.quote{font-size:29px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="eyebrow">A little thought, every day</div>
+    <h1>For Amma</h1>
+    <div class="sub" id="subtitle">Loading your collection…</div>
+  </header>
+
+  <main id="home">
+    <div id="todayCard" class="hero"></div>
+    <div class="section">
+      <h2>Browse</h2>
+      <div class="grid">
+        <button class="chip" onclick="showPage('days')"><b>All days</b><span>Read the collection</span></button>
+        <button class="chip" onclick="showPage('sections')"><b>Sections</b><span>Explore by theme</span></button>
+      </div>
+    </div>
+  </main>
+
+  <main id="days" class="hidden">
+    <div class="section" style="margin-top:4px"><h2>All days</h2><div id="daysList" class="list"></div></div>
+  </main>
+
+  <main id="sections" class="hidden">
+    <div class="section" style="margin-top:4px"><h2>Sections</h2><div id="sectionList" class="grid"></div></div>
+    <div id="sectionResults" class="section hidden"><h2 id="sectionTitle"></h2><div id="sectionItems" class="list"></div></div>
+  </main>
+</div>
+
+<nav>
+  <button id="nav-home" class="active" onclick="showPage('home')">⌂<br>Today</button>
+  <button id="nav-days" onclick="showPage('days')">☷<br>Days</button>
+  <button id="nav-sections" onclick="showPage('sections')">◈<br>Sections</button>
+</nav>
+
+<script>
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaomIQn_nLvIPERtpget8Y20iSDY_3pSlEGfwhzkvMfUHXIQ2P3XvQ0R0IB6SX4hBEonVRcvxXsIl/pub?output=csv";
+let quotes = [];
+let currentIndex = -1;
+
+function parseCSV(text){
+  const rows=[]; let row=[], cell="", quoted=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c === '"' && quoted && n === '"'){cell+='"';i++;continue}
+    if(c === '"'){quoted=!quoted;continue}
+    if(c === ',' && !quoted){row.push(cell);cell="";continue}
+    if((c === '\n' || c === '\r') && !quoted){
+      if(c === '\r' && n === '\n') i++;
+      row.push(cell); cell="";
+      if(row.some(x=>x.trim()!=="")) rows.push(row);
+      row=[]; continue;
+    }
+    cell+=c;
+  }
+  if(cell!=="" || row.length){row.push(cell);if(row.some(x=>x.trim()!==""))rows.push(row)}
+  if(!rows.length)return [];
+  const headers=rows.shift().map(h=>h.trim().toLowerCase());
+  return rows.map(r=>{
+    const o={}; headers.forEach((h,i)=>o[h]=(r[i]||"").trim()); return o;
+  }).filter(x=>x.date && x.quote);
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function niceDate(s){
+  const d=new Date(s+"T00:00:00");
+  return isNaN(d) ? s : d.toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"});
+}
+function todayISO(){
+  const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function renderQuote(q, idx, label=""){
+  currentIndex=idx;
+  const author=q.author ? `<div class="author">— ${esc(q.author)}</div>` : "";
+  document.getElementById("todayCard").innerHTML=`
+    <div class="date">${label ? esc(label)+" · " : ""}${esc(niceDate(q.date))}</div>
+    <div class="quote">${esc(q.quote)}</div>
+    ${author}
+    <div class="small" style="margin-top:15px">${q.section ? esc(q.section) : ""}</div>
+    <div class="actions">
+      <button class="btn" ${idx<=0?"disabled":""} onclick="openQuote(${idx-1})">← Previous</button>
+      <button class="btn primary" ${idx>=quotes.length-1?"disabled":""} onclick="openQuote(${idx+1})">Next →</button>
+    </div>`;
+}
+function openQuote(i){
+  if(i<0||i>=quotes.length)return;
+  showPage("home");
+  renderQuote(quotes[i],i);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function showPage(page){
+  ["home","days","sections"].forEach(p=>document.getElementById(p).classList.toggle("hidden",p!==page));
+  ["home","days","sections"].forEach(p=>document.getElementById("nav-"+p).classList.toggle("active",p===page));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderLists(){
+  const days=document.getElementById("daysList");
+  days.innerHTML=quotes.map((q,i)=>`<div class="item" onclick="openQuote(${i})"><div class="item-date">${esc(niceDate(q.date))}</div><div class="item-text">${esc(q.quote.slice(0,150))}${q.quote.length>150?"…":""}</div><div class="item-section">${esc(q.section||"")}</div></div>`).join("");
+  const counts={}; quotes.forEach(q=>counts[q.section||"Other"]=(counts[q.section||"Other"]||0)+1);
+  document.getElementById("sectionList").innerHTML=Object.entries(counts).sort().map(([s,n])=>`<button class="chip" onclick="showSection(${JSON.stringify(s)})"><b>${esc(s)}</b><span>${n} ${n===1?"thought":"thoughts"}</span></button>`).join("");
+}
+function showSection(s){
+  const arr=quotes.map((q,i)=>({q,i})).filter(x=>(x.q.section||"Other")===s);
+  document.getElementById("sectionResults").classList.remove("hidden");
+  document.getElementById("sectionTitle").textContent=s;
+  document.getElementById("sectionItems").innerHTML=arr.map(x=>`<div class="item" onclick="openQuote(${x.i})"><div class="item-date">${esc(niceDate(x.q.date))}</div><div class="item-text">${esc(x.q.quote.slice(0,180))}${x.q.quote.length>180?"…":""}</div></div>`).join("");
+  document.getElementById("sectionResults").scrollIntoView({behavior:"smooth"});
+}
+async function load(){
+  try{
+    const res=await fetch(CSV_URL + (CSV_URL.includes("?")?"&":"?") + "_=" + Date.now(), {cache:"no-store"});
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const data=parseCSV(await res.text());
+    data.sort((a,b)=>a.date.localeCompare(b.date));
+    quotes=data;
+    if(!quotes.length)throw new Error("No quote rows found");
+    const t=todayISO(), idx=quotes.findIndex(q=>q.date===t);
+    document.getElementById("subtitle").textContent=`${quotes.length} thoughts · updated from your collection`;
+    renderLists();
+    if(idx>=0) renderQuote(quotes[idx],idx,"Today's thought");
+    else {
+      document.getElementById("todayCard").innerHTML=`<div class="date">Today · ${niceDate(t)}</div>
+      <div class="quote">Today's thought hasn't been added yet.</div>
+      <div class="author">Choose a day below to browse the collection.</div>
+      <div class="actions"><button class="btn primary" onclick="showPage('days')">Browse days →</button></div>`;
+    }
+    localStorage.setItem("forAmmaQuotes",JSON.stringify(quotes));
+  }catch(e){
+    const cached=localStorage.getItem("forAmmaQuotes");
+    if(cached){
+      quotes=JSON.parse(cached); renderLists();
+      const idx=quotes.findIndex(q=>q.date===todayISO());
+      if(idx>=0)renderQuote(quotes[idx],idx,"Today's thought");
+      else renderQuote(quotes[quotes.length-1],quotes.length-1,"Latest available");
+      document.getElementById("subtitle").textContent="Showing the last saved collection · reconnect to refresh";
+    }else{
+      document.getElementById("todayCard").innerHTML=`<div class="status"><b>Couldn't load the collection.</b><br><br>Please check the internet connection and open the app again.</div>`;
+      document.getElementById("subtitle").textContent="Waiting for the quote collection…";
+    }
+  }
+}
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+load();
+</script>
+</body>
+</html>
