@@ -1,15 +1,19 @@
-# For Amma — Daily Quote App
+DHAMMA DAILY
 
-This is a Progressive Web App (PWA). It reads the live CSV published from the Google Sheet.
+A simple installable PWA for a daily Dhamma thought.
 
-## Deploy
-Upload all files in this folder to a static host such as GitHub Pages, then open the resulting HTTPS URL on the phone and choose Install/Add to Home Screen.
+LIVE DATA
+The app reads your published Google Sheet CSV. You can edit the sheet and the app will fetch the updated collection when opened/refreshed.
 
-## Google Sheet columns
-The first row should contain:
-date | quote | author | section
+SHEET FORMAT
+Date | Quote | Section | Author (optional)
 
-Dates should be YYYY-MM-DD.
+Dates can be entered with or without a year. The app matches the month and day, so a thought for 3 October will repeat every year without requiring you to change the year.
 
-## Important
-The published CSV is publicly readable. Do not put passwords, financial information, or other sensitive/private information in the sheet.
+INSTALL
+1. Deploy these files to a static host such as GitHub Pages.
+2. Open the site in Chrome on the phone.
+3. Use Chrome's Add to Home screen / Install app option.
+
+IMPORTANT PRIVACY NOTE
+Because the app reads a published Google Sheet CSV directly, the sheet data is publicly readable. Do not put sensitive or private information in the sheet.

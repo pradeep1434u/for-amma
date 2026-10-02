@@ -1,10 +1,18 @@
-const CACHE="for-amma-v1";
-const ASSETS=["./","./index.html","./manifest.json","./icon.svg","./sw.js"];
-self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));
-self.addEventListener("fetch",e=>{
-  if(e.request.url.includes("docs.google.com")) return;
-  e.respondWith(caches.match(e.request).then(cached=>cached||fetch(e.request).then(r=>{
-    const copy=r.clone(); caches.open(CACHE).then(c=>c.put(e.request,copy)); return r;
-  }).catch(()=>cached)));
+const CACHE = "dhamma-daily-v2";
+const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
+self.addEventListener("install", event => {
+  event.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+});
+self.addEventListener("activate", event => {
+  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener("fetch", event => {
+  const url = new URL(event.request.url);
+  // Keep Google Sheets live so changes appear without reinstalling the app.
+  if (url.hostname.includes("docs.google.com")) return;
+  event.respondWith(fetch(event.request).then(response => {
+    const copy = response.clone();
+    caches.open(CACHE).then(c => c.put(event.request, copy));
+    return response;
+  }).catch(() => caches.match(event.request).then(r => r || caches.match("./index.html"))));
 });

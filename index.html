@@ -7,7 +7,7 @@
   <meta name="description" content="A daily collection of thoughts, wisdom and love for Amma.">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>For Amma</title>
+  <title>Dhamma Daily</title>
   <style>
     :root{--bg:#fbf4e8;--card:#fffaf2;--ink:#3d342a;--muted:#786e62;--accent:#a56b35;--line:#eadcc8;--soft:#f1e2cc}
     *{box-sizing:border-box} html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -35,8 +35,8 @@
 <body>
 <div class="app">
   <header>
-    <div class="eyebrow">A little thought, every day</div>
-    <h1>For Amma</h1>
+    <div class="eyebrow">A little Dhamma thought, every day</div>
+    <h1>Dhamma Daily</h1>
     <div class="sub" id="subtitle">Loading your collection…</div>
   </header>
 
@@ -56,8 +56,12 @@
   </main>
 
   <main id="sections" class="hidden">
-    <div class="section" style="margin-top:4px"><h2>Sections</h2><div id="sectionList" class="grid"></div></div>
-    <div id="sectionResults" class="section hidden"><h2 id="sectionTitle"></h2><div id="sectionItems" class="list"></div></div>
+    <div id="sectionBrowse" class="section" style="margin-top:4px"><h2>Sections</h2><div id="sectionList" class="grid"></div></div>
+    <div id="sectionResults" class="section hidden" style="margin-top:4px">
+      <button class="btn" onclick="backToSections()">← All sections</button>
+      <h2 id="sectionTitle" style="margin-top:22px"></h2>
+      <div id="sectionItems" class="list"></div>
+    </div>
   </main>
 </div>
 
@@ -95,12 +99,24 @@ function parseCSV(text){
   }).filter(x=>x.date && x.quote);
 }
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function niceDate(s){
-  const d=new Date(s+"T00:00:00");
-  return isNaN(d) ? s : d.toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"});
+function dateParts(s){
+  const raw=String(s||"").trim();
+  let m;
+  if((m=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) return {year:+m[1],month:+m[2],day:+m[3],key:String(+m[2]).padStart(2,"0")+"-"+String(+m[3]).padStart(2,"0")};
+  if((m=raw.match(/^(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{4}))?$/))) return {year:m[3]?+m[3]:null,month:+m[2],day:+m[1],key:String(+m[2]).padStart(2,"0")+"-"+String(+m[1]).padStart(2,"0")};
+  const d=new Date(raw);
+  if(!isNaN(d)) return {year:d.getFullYear(),month:d.getMonth()+1,day:d.getDate(),key:String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+  return {year:null,month:null,day:null,key:raw};
 }
-function todayISO(){
-  const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function dateKey(s){ return dateParts(s).key; }
+function niceDate(s){
+  const p=dateParts(s);
+  if(!p.month||!p.day)return s;
+  const d=new Date(2000,p.month-1,p.day);
+  return d.toLocaleDateString(undefined,{day:"numeric",month:"long"}) + (p.year ? ", " + p.year : "");
+}
+function todayKey(){
+  const d=new Date(); return String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 function renderQuote(q, idx, label=""){
   currentIndex=idx;
@@ -134,25 +150,31 @@ function renderLists(){
 }
 function showSection(s){
   const arr=quotes.map((q,i)=>({q,i})).filter(x=>(x.q.section||"Other")===s);
+  document.getElementById("sectionBrowse").classList.add("hidden");
   document.getElementById("sectionResults").classList.remove("hidden");
   document.getElementById("sectionTitle").textContent=s;
   document.getElementById("sectionItems").innerHTML=arr.map(x=>`<div class="item" onclick="openQuote(${x.i})"><div class="item-date">${esc(niceDate(x.q.date))}</div><div class="item-text">${esc(x.q.quote.slice(0,180))}${x.q.quote.length>180?"…":""}</div></div>`).join("");
-  document.getElementById("sectionResults").scrollIntoView({behavior:"smooth"});
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function backToSections(){
+  document.getElementById("sectionResults").classList.add("hidden");
+  document.getElementById("sectionBrowse").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 async function load(){
   try{
     const res=await fetch(CSV_URL + (CSV_URL.includes("?")?"&":"?") + "_=" + Date.now(), {cache:"no-store"});
     if(!res.ok)throw new Error("HTTP "+res.status);
     const data=parseCSV(await res.text());
-    data.sort((a,b)=>a.date.localeCompare(b.date));
+    data.sort((a,b)=>dateKey(a.date).localeCompare(dateKey(b.date)));
     quotes=data;
     if(!quotes.length)throw new Error("No quote rows found");
-    const t=todayISO(), idx=quotes.findIndex(q=>q.date===t);
+    const t=todayKey(), idx=quotes.findIndex(q=>dateKey(q.date)===t);
     document.getElementById("subtitle").textContent=`${quotes.length} thoughts · updated from your collection`;
     renderLists();
     if(idx>=0) renderQuote(quotes[idx],idx,"Today's thought");
     else {
-      document.getElementById("todayCard").innerHTML=`<div class="date">Today · ${niceDate(t)}</div>
+      document.getElementById("todayCard").innerHTML=`<div class="date">Today · ${niceDate(new Date().getFullYear()+"-"+t)}</div>
       <div class="quote">Today's thought hasn't been added yet.</div>
       <div class="author">Choose a day below to browse the collection.</div>
       <div class="actions"><button class="btn primary" onclick="showPage('days')">Browse days →</button></div>`;
@@ -162,7 +184,7 @@ async function load(){
     const cached=localStorage.getItem("forAmmaQuotes");
     if(cached){
       quotes=JSON.parse(cached); renderLists();
-      const idx=quotes.findIndex(q=>q.date===todayISO());
+      const idx=quotes.findIndex(q=>dateKey(q.date)===todayKey());
       if(idx>=0)renderQuote(quotes[idx],idx,"Today's thought");
       else renderQuote(quotes[quotes.length-1],quotes.length-1,"Latest available");
       document.getElementById("subtitle").textContent="Showing the last saved collection · reconnect to refresh";
