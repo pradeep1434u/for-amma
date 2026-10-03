@@ -19,7 +19,7 @@ body{padding-bottom:84px}.app{max-width:720px;margin:auto;padding:20px 18px}head
 .hero{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:28px 24px;box-shadow:0 10px 30px #6b51351a;min-height:520px;display:flex;flex-direction:column;touch-action:pan-y}.viewer{display:flex;flex-direction:column;flex:1}.date{font-size:13px;color:var(--accent);font-weight:700;margin-bottom:22px}.quote{font-family:Georgia,serif;font-size:25px;line-height:1.55;white-space:pre-wrap;overflow:visible;max-height:none;overflow-wrap:anywhere}.author{margin-top:20px;color:var(--muted);font-size:14px}.small{font-size:12px;color:var(--muted)}.context-back{margin-bottom:18px}
 .actions{display:flex;gap:10px;margin-top:auto;min-height:48px;align-items:center;justify-content:center;padding-top:24px}.fav-btn{margin-left:auto;border:1px solid var(--line);background:var(--soft);color:var(--accent);width:42px;height:42px;border-radius:50%;font-size:21px;cursor:pointer}.fav-btn.active{background:#f0d7aa;border-color:#d3ad70}.quote-top{display:flex;align-items:flex-start;gap:12px}.quote-top .date{flex:1}.btn{border:1px solid var(--line);background:var(--soft);color:var(--ink);padding:11px 15px;border-radius:14px;font-weight:650;cursor:pointer}.btn.primary{background:var(--accent);color:white;border-color:var(--accent)}.btn:disabled{opacity:.45;cursor:default}
 .status{padding:18px;border-radius:18px;background:var(--soft);color:var(--muted);line-height:1.5}
-nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fffaf2ee;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px max(14px,calc((100vw - 720px)/2 + 14px));display:flex;justify-content:space-around}nav button{border:0;background:none;color:var(--muted);font-size:12px;padding:6px 12px;cursor:pointer}nav button.active{color:var(--accent);font-weight:800}
+nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fffaf2ee;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px max(14px,calc((100vw - 720px)/2 + 14px));display:flex;justify-content:space-around}nav button{border:0;background:none;color:var(--muted);font-size:14px;font-weight:700;padding:7px 12px;cursor:pointer;line-height:1.25}nav button.active{color:var(--accent);font-weight:850}
 @media(min-width:600px){.quote{font-size:29px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
@@ -29,7 +29,6 @@ nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fffaf2ee;backd
 
 <main id="home">
   <div id="todayCard" class="hero"></div>
-  <div class="section"><h2>Browse</h2><div class="grid"><button class="chip" onclick="showPage('days')"><b>All days</b><span>Read the collection</span></button><button class="chip" onclick="showPage('sections')"><b>Sections</b><span>Explore by theme</span></button><button class="chip" onclick="showPage('favorites')"><b>Favorites</b><span>Your bookmarked thoughts</span></button></div></div>
 </main>
 
 <main id="days" class="hidden">
