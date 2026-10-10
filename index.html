@@ -44,6 +44,13 @@ body{padding-bottom:84px}.app{max-width:720px;margin:auto;padding:20px 18px}head
 /* Compact monthly summary so its key figures fit on a typical phone screen. */
 #monthSummary .grid{gap:8px}#monthSummary .practice-card{padding:10px 12px;margin-bottom:8px;border-radius:14px}#monthSummary .grid .practice-card{min-height:76px;display:flex;flex-direction:column;justify-content:center}#monthSummary .grid .small{font-size:11px;line-height:1.25}#monthSummary .grid h2{font-size:22px;margin:4px 0 0;line-height:1.15}#monthSummary .level-summary{padding:9px 12px;margin-top:8px}#monthSummary .level-summary h3{font-size:15px;margin:0 0 4px}#monthSummary .level-row{display:flex;justify-content:space-between;align-items:center;min-height:31px;padding:4px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.2}#monthSummary .level-row:last-child{border-bottom:0}#monthSummary .level-row b{font-size:15px}#month .section h2{margin-bottom:9px}#month .field-label{margin:6px 0 4px}#month .field{padding:8px 10px}#month .toggle-row{margin-top:8px!important;margin-bottom:8px}#month .toggle-row .btn{padding:9px 11px}
 nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fffaf2ee;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:10px max(14px,calc((100vw - 720px)/2 + 14px));display:flex;justify-content:space-around}nav button{border:0;background:none;color:var(--muted);font-size:14px;font-weight:700;padding:7px 12px;cursor:pointer;line-height:1.25}nav button.active{color:var(--accent);font-weight:850}
+/* v22: evenly sized bottom navigation targets and more readable monthly headline cards. */
+nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:9px max(8px,calc((100vw - 720px)/2 + 8px));align-items:stretch}
+nav button{width:100%;min-width:0;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 2px;font-size:12px;line-height:1.2;white-space:normal;overflow-wrap:anywhere}
+#monthSummary .grid .small{font-size:14px;line-height:1.3;font-weight:700;color:var(--ink)}
+#monthSummary .grid .practice-card{min-height:94px;padding:13px 10px}
+#monthSummary .grid h2{font-size:25px;margin-top:7px}
+@media(max-width:390px){nav button{font-size:10.5px;gap:2px}#monthSummary .grid .small{font-size:12px}}
 @media(min-width:600px){.quote{font-size:29px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
