@@ -89,7 +89,7 @@ nav button{width:100%;min-width:0;min-height:58px;display:flex;flex-direction:co
 <div class="app">
 <header><button class="top-fav" aria-label="Favorites" onclick="showPage('favorites')">☆</button><div class="eyebrow">A little Dhamma thought, every day</div><h1>Dhamma Daily</h1><div class="sub" id="subtitle">Loading your collection…</div></header>
 
-<main id="home">
+<main id="home" class="hidden">
   <div id="todayCard" class="hero"></div>
 </main>
 
@@ -97,7 +97,7 @@ nav button{width:100%;min-width:0;min-height:58px;display:flex;flex-direction:co
   <div id="daysBrowse" class="section" style="margin-top:4px"><h2>All days</h2><div id="daysList" class="list"></div></div>
 </main>
 
-<main id="pledge" class="hidden">
+<main id="pledge">
   <section class="welcome-card" aria-label="రోజువారీ శుభాకాంక్షలు">
     <img class="welcome-buddha" src="buddha-welcome.jpg" alt="ప్రశాంతంగా ధ్యానం చేస్తున్న బుద్ధుడు">
     <div class="welcome-greeting">శుభోదయం 🙏</div>
@@ -145,7 +145,7 @@ nav button{width:100%;min-width:0;min-height:58px;display:flex;flex-direction:co
   </div>
 </main>
 </div>
-<nav><button id="nav-pledge" onclick="showPage('pledge')">✿<br>Daily Pledge</button><button id="nav-home" class="active" onclick="showPage('home')">⌂<br>Today</button><button id="nav-days" onclick="showPage('days')">☷<br>Days</button><button id="nav-sections" onclick="showPage('sections')">◈<br>Sections</button><button id="nav-practice" onclick="showPage('practice')">✓<br>Daily Practice</button></nav>
+<nav><button id="nav-pledge" class="active" onclick="showPage('pledge')">✿<br>Daily Pledge</button><button id="nav-home" onclick="showPage('home')">⌂<br>Today</button><button id="nav-days" onclick="showPage('days')">☷<br>Days</button><button id="nav-sections" onclick="showPage('sections')">◈<br>Sections</button><button id="nav-practice" onclick="showPage('practice')">✓<br>Daily Practice</button></nav>
 
 <script>
 const CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vRaaomIQn_nLvIPERtpget8Y20iSDY_3pSlEGfwhzkvMfUHXIQ2P3XvQ0R0IB6SX4hBEonVRcvxXsIl/pub?output=csv";
@@ -247,3 +247,22 @@ function renderPledge(){const qs=quotes.filter(q=>(q.section||'').trim().toLower
 load();
 </script>
 </body></html>
+
+<style>
+/* v25: start on Daily Pledge; fit the complete welcome panel on a typical phone screen. */
+.app{padding-top:8px;padding-bottom:12px}header{padding-top:4px;padding-bottom:8px}.eyebrow{font-size:10px}h1{font-size:27px;margin:3px 0}.sub{font-size:11px}
+#pledge .welcome-card{padding:0 16px 12px;margin:0 0 12px;border-radius:18px}
+#pledge .welcome-buddha{width:calc(100% + 32px);height:clamp(105px,19vh,150px);object-fit:cover;object-position:center 38%;margin:0 -16px 8px;border-radius:17px 17px 0 0}
+#pledge .welcome-greeting{font-size:13px;margin-bottom:2px}
+#pledge .welcome-card h2{font-size:clamp(21px,5.5vw,26px);line-height:1.2;margin:3px 0 7px}
+#pledge .welcome-card p{font-size:clamp(12px,3.5vw,14px);line-height:1.45;margin:0 auto 6px;max-width:42em}
+#pledge .welcome-blessing{font-size:clamp(13px,3.7vw,16px);line-height:1.4;margin-top:8px;padding-top:8px}
+#pledge .welcome-reminder{font-size:12px;line-height:1.35;margin-top:4px}
+#pledge .welcome-date{font-size:13px;line-height:1.35;margin-top:8px;padding-top:7px}
+#pledge .welcome-footer{font-size:11px;margin-top:3px}
+#pledge .section{margin-top:10px!important}
+#pledge .section h2{font-family:system-ui,-apple-system,sans-serif;font-size:19px;font-weight:750;margin:0 0 9px;padding:0 2px}
+#pledge .pledge-list{gap:9px}
+#pledge .pledge-item{font-family:system-ui,-apple-system,sans-serif;font-size:17px;line-height:1.65;padding:15px 17px;border-radius:16px;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;border-left:4px solid #c49a5b;box-shadow:0 3px 10px #6b51350b}
+@media(max-height:720px){#pledge .welcome-buddha{height:clamp(82px,15vh,115px)}#pledge .welcome-card{padding-bottom:8px}#pledge .welcome-card p{font-size:12px;line-height:1.35;margin-bottom:4px}#pledge .welcome-blessing{margin-top:5px;padding-top:5px}#pledge .welcome-date{margin-top:5px;padding-top:5px}}
+</style>
