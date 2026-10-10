@@ -119,22 +119,41 @@ function voiceMessage(msg,listening=false){const el=document.getElementById('voi
 function startVoiceRecognition(SpeechRecognition){
   if(voiceStopRequested)return;
   try{
-    speechRecognition=new SpeechRecognition();speechRecognition.lang='te-IN';speechRecognition.continuous=true;speechRecognition.interimResults=true;voiceSessionResults=[];
-    speechRecognition.onstart=()=>{voiceListening=true;document.getElementById('voiceButton').textContent='🎙️ వింటోంది…';document.getElementById('voiceStopButton').classList.remove('hidden');voiceMessage('వింటోంది… పూర్తయ్యాక ఆపండి.',true)};
+    speechRecognition=new SpeechRecognition();
+    speechRecognition.lang='te-IN';
+    speechRecognition.continuous=false;
+    speechRecognition.interimResults=false;
+    voiceSessionResults=[];
+    speechRecognition.onstart=()=>{voiceListening=true;document.getElementById('voiceButton').textContent='🎙️ వింటోంది…';document.getElementById('voiceStopButton').classList.remove('hidden');voiceMessage('వింటోంది… వాక్యం పూర్తయ్యాక ఆపండి.',true)};
     speechRecognition.onresult=(event)=>{
-      for(let i=0;i<event.results.length;i++){const result=event.results[i];voiceSessionResults[i]={text:result[0].transcript.trim(),final:result.isFinal};}
-      const recognized=voiceSessionResults.filter(x=>x&&x.text).map(x=>x.text).join(' ').trim();
-      const pieces=[voiceBaseText,recognized].filter(Boolean);
-      document.getElementById('reviewText').value=pieces.join(' ');saveReview();
+      const received=[];
+      for(let i=0;i<event.results.length;i++){
+        const result=event.results[i];
+        if(!result.isFinal)continue;
+        const text=(result[0].transcript||'').trim();
+        if(text && received[received.length-1]!==text)received.push(text);
+      }
+      // This is a one-shot recognition session: replace the current session text,
+      // rather than appending the same cumulative result every time an event fires.
+      voiceSessionResults=received;
+      const recognized=received.join(' ').trim();
+      document.getElementById('reviewText').value=[voiceBaseText,recognized].filter(Boolean).join(' ');
+      saveReview();
     };
-    speechRecognition.onerror=(event)=>{const msgs={'not-allowed':'మైక్రోఫోన్ అనుమతి ఇవ్వండి. బ్రౌజర్ సెట్టింగ్స్‌లో అనుమతిని పరిశీలించండి.','service-not-allowed':'ఈ బ్రౌజర్‌లో వాయిస్ గుర్తింపు సేవ అందుబాటులో లేదు. కీబోర్డ్ మైక్‌ను ఉపయోగించండి.','network':'వాయిస్ గుర్తింపుకు ఇంటర్నెట్ అవసరం కావచ్చు. కనెక్షన్‌ను పరిశీలించండి.','no-speech':'మాటలు గుర్తించబడలేదు. మళ్లీ ప్రయత్నించండి.'};voiceMessage(msgs[event.error]||('వాయిస్ గుర్తింపు సమస్య: '+event.error),false);if(event.error==='not-allowed'||event.error==='service-not-allowed')voiceStopRequested=true;};
+    speechRecognition.onerror=(event)=>{
+      const msgs={'not-allowed':'మైక్రోఫోన్ అనుమతి ఇవ్వండి. బ్రౌజర్ సెట్టింగ్స్‌లో అనుమతిని పరిశీలించండి.','service-not-allowed':'ఈ బ్రౌజర్‌లో వాయిస్ గుర్తింపు సేవ అందుబాటులో లేదు. కీబోర్డ్ మైక్‌ను ఉపయోగించండి.','network':'వాయిస్ గుర్తింపుకు ఇంటర్నెట్ అవసరం కావచ్చు. కనెక్షన్‌ను పరిశీలించండి.','no-speech':'మాటలు గుర్తించబడలేదు. మళ్లీ ప్రయత్నించండి.'};
+      voiceMessage(msgs[event.error]||('వాయిస్ గుర్తింపు సమస్య: '+event.error),false);
+      if(event.error==='not-allowed'||event.error==='service-not-allowed')voiceStopRequested=true;
+    };
     speechRecognition.onend=()=>{
       voiceListening=false;
-      const recognized=voiceSessionResults.filter(x=>x&&x.text).map(x=>x.text).join(' ').trim();
+      const recognized=voiceSessionResults.join(' ').trim();
       document.getElementById('reviewText').value=[voiceBaseText,recognized].filter(Boolean).join(' ');
-      saveReview();document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';document.getElementById('voiceStopButton').classList.add('hidden');
-      if(voiceStopRequested){voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');}
-      else {voiceMessage(recognized?'రికార్డింగ్ ఆగింది. అవసరమైతే మళ్లీ మాట్లాడండి లేదా సవరించండి.':'మాటలు నమోదు కాలేదు. మళ్లీ ప్రయత్నించండి; సమస్య కొనసాగితే కీబోర్డ్ మైక్‌ను ఉపయోగించండి.');}
+      saveReview();
+      document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';
+      document.getElementById('voiceStopButton').classList.add('hidden');
+      if(voiceStopRequested)voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');
+      else voiceMessage(recognized?'రికార్డింగ్ పూర్తయింది. అవసరమైతే మళ్లీ మాట్లాడండి లేదా సవరించండి.':'మాటలు నమోదు కాలేదు. మళ్లీ ప్రయత్నించండి; సమస్య కొనసాగితే కీబోర్డ్ మైక్‌ను ఉపయోగించండి.');
     };
     speechRecognition.start();
   }catch(e){voiceListening=false;voiceStopRequested=true;document.getElementById('voiceStopButton').classList.add('hidden');voiceMessage('మైక్ ప్రారంభం కాలేదు. బ్రౌజర్ అనుమతులు పరిశీలించి మళ్లీ ప్రయత్నించండి.');}
