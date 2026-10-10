@@ -70,6 +70,19 @@ nav button{width:100%;min-width:0;min-height:58px;display:flex;flex-direction:co
 #monthSummary .headline-copy h2{font-size:28px;line-height:1;margin:0}
 @media(max-width:390px){.welcome-card{padding:21px 16px 18px;border-radius:22px}.welcome-card h2{font-size:26px}.welcome-card p{font-size:15px}.welcome-blessing{font-size:16px}#monthSummary .headline-card{gap:7px;padding:11px 8px;min-height:98px}#monthSummary .headline-icon{font-size:35px;width:37px}#monthSummary .headline-copy .small{font-size:11px}#monthSummary .headline-copy h2{font-size:25px}}
 
+
+/* v24: move the welcome into Daily Pledge, show Buddha artwork, and improve Telugu readability. */
+.welcome-card{padding:0 22px 24px;text-align:center}
+.welcome-buddha{display:block;width:calc(100% + 44px);height:260px;max-width:none;object-fit:cover;object-position:center 38%;margin:0 -22px 20px;border-radius:25px 25px 0 0}
+.welcome-greeting{font-size:19px;letter-spacing:0;margin-bottom:6px}
+.welcome-card h2{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:32px;line-height:1.35;margin:8px 0 18px}
+.welcome-card p{font-size:20px;line-height:1.85;margin:0 auto 14px;max-width:42em}
+.welcome-blessing{font-size:22px;line-height:1.7;margin-top:20px;padding-top:18px}
+.welcome-reminder{font-size:18px;line-height:1.7;margin-top:12px}
+.welcome-date{font-size:19px;line-height:1.6;margin-top:20px;padding-top:16px}
+.welcome-footer{font-size:16px;letter-spacing:0;margin-top:8px}
+#pledge .section h2{font-size:26px}
+@media(max-width:390px){.welcome-card{padding:0 16px 20px}.welcome-buddha{width:calc(100% + 32px);height:235px;margin:0 -16px 18px}.welcome-card h2{font-size:28px}.welcome-card p{font-size:18px;line-height:1.8}.welcome-blessing{font-size:20px}.welcome-reminder{font-size:17px}.welcome-date{font-size:17px}}
 </style>
 </head>
 <body>
@@ -77,9 +90,17 @@ nav button{width:100%;min-width:0;min-height:58px;display:flex;flex-direction:co
 <header><button class="top-fav" aria-label="Favorites" onclick="showPage('favorites')">☆</button><div class="eyebrow">A little Dhamma thought, every day</div><h1>Dhamma Daily</h1><div class="sub" id="subtitle">Loading your collection…</div></header>
 
 <main id="home">
+  <div id="todayCard" class="hero"></div>
+</main>
+
+<main id="days" class="hidden">
+  <div id="daysBrowse" class="section" style="margin-top:4px"><h2>All days</h2><div id="daysList" class="list"></div></div>
+</main>
+
+<main id="pledge" class="hidden">
   <section class="welcome-card" aria-label="రోజువారీ శుభాకాంక్షలు">
-    <div class="welcome-lotus" aria-hidden="true">🪷</div>
-    <div class="welcome-greeting">శుభోదయం అమ్మా 🙏</div>
+    <img class="welcome-buddha" src="buddha-welcome.jpg" alt="ప్రశాంతంగా ధ్యానం చేస్తున్న బుద్ధుడు">
+    <div class="welcome-greeting">శుభోదయం 🙏</div>
     <h2>మరో అందమైన రోజు!</h2>
     <p>నీ లక్ష్యానికి మరింత చేరువయ్యేందుకు ఈ రోజు నీకు లభించిన మరో కొత్త అవకాశం.</p>
     <p>ఈ అమూల్యమైన రోజును సద్వినియోగం చేసుకో. ప్రతి అడుగునూ ఎరుకతో, సహనంతో, ప్రశాంతమైన మనసుతో వేయి.</p>
@@ -88,14 +109,8 @@ nav button{width:100%;min-width:0;min-height:58px;display:flex;flex-direction:co
     <div id="welcomeDate" class="welcome-date"></div>
     <div class="welcome-footer">ఈ రోజు ఒక వరం ❤️</div>
   </section>
-  <div id="todayCard" class="hero"></div>
+  <div class="section" style="margin-top:20px"><h2>రోజువారీ ప్రతిజ్ఞ</h2><div id="pledgeList" class="pledge-list"></div></div>
 </main>
-
-<main id="days" class="hidden">
-  <div id="daysBrowse" class="section" style="margin-top:4px"><h2>All days</h2><div id="daysList" class="list"></div></div>
-</main>
-
-<main id="pledge" class="hidden"><div class="section" style="margin-top:4px"><h2>రోజువారీ ప్రతిజ్ఞ</h2><div id="pledgeList" class="pledge-list"></div></div></main>
 
 <main id="practice" class="hidden">
  <div class="section" style="margin-top:4px"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h2>రోజువారీ సాధన</h2><button class="btn" onclick="showPage('month')">నెలవారీ వివరాలు</button></div>
