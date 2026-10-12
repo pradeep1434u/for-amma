@@ -267,6 +267,10 @@ function startVoiceRecognition(SpeechRecognition){
   }
 }
 
+function toggleVoiceInput(){if(voiceListening){stopVoiceInput();return}const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SpeechRecognition){voiceMessage('ఈ బ్రౌజర్‌లో నేరుగా వాయిస్ గుర్తింపు అందుబాటులో లేదు. కీబోర్డ్ మైక్‌ను ఉపయోగించండి.');return}if(document.getElementById('skipReview').checked){voiceMessage('ముందుగా వ్యాఖ్య రాయదలచుకోలేదు అనే ఎంపికను తీసివేయండి.');return}voiceStopRequested=false;voiceBaseText=document.getElementById('reviewText').value.trim();voiceSessionResults=[];startVoiceRecognition(SpeechRecognition)}
+
+function stopVoiceInput(){voiceStopRequested=true;if(voiceRestartTimer){clearTimeout(voiceRestartTimer);voiceRestartTimer=null}if(speechRecognition&&voiceListening){try{speechRecognition.stop()}catch(e){voiceListening=false;document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';document.getElementById('voiceStopButton').classList.add('hidden');voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');saveReview()}}else{voiceListening=false;document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';document.getElementById('voiceStopButton').classList.add('hidden');voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');saveReview()}}
+
 function toggleSkipReview(){const target=shiftISO(selectedDate(),-1),r=getRecord(target);r.skipComment=document.getElementById('skipReview').checked;if(r.skipComment){r.comment='';document.getElementById('reviewText').value='';document.getElementById('reviewText').disabled=true}else document.getElementById('reviewText').disabled=false;practiceRecords[target]=r;saveAll()}
 function renderMinuteLevel(){const el=document.getElementById('minutesLevel'),level=levelForMinutes(document.getElementById('practiceMinutes').value);if(!level){el.classList.add('hidden');el.innerHTML='';return}el.classList.remove('hidden');el.innerHTML=`<span class="symbol">${level.symbol}</span>${level.name}`}
 function setMonthView(v){setPracticeTab(v==='daily'?'daily':'monthly')}
