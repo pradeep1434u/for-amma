@@ -202,7 +202,7 @@ function loadPracticeForm(){const date=document.getElementById('practiceDate');i
 function savePractice(confirmSave=false,saveMinutes=false){const iso=selectedDate(),r=getRecord(iso);r.pledge=document.getElementById('taskPledge').checked;r.sit=document.getElementById('taskSit').checked;r.reviewDone=document.getElementById('taskReview').checked;if(saveMinutes)r.minutes=document.getElementById('practiceMinutes').value;practiceRecords[iso]=r;saveAll();document.getElementById('victoryLevel').classList.toggle('hidden',!(r.pledge&&r.sit&&r.reviewDone));renderMinuteLevel();if(confirmSave){const mins=document.getElementById('practiceMinutes').value;document.getElementById('saveStatus').textContent='✓ సేవ్ అయ్యింది'+(mins!==''?' · '+mins+' నిమిషాలు నమోదు అయ్యాయి':'');document.getElementById('saveStatus').classList.add('saved');if(!document.getElementById('practiceDailyPanel').classList.contains('hidden')||!document.getElementById('practiceMonthlyPanel').classList.contains('hidden'))renderMonth()}}
 function setPracticeTab(tab){const entry=tab==='entry',daily=tab==='daily',monthly=tab==='monthly';document.getElementById('practiceEntryPanel').classList.toggle('hidden',!entry);document.getElementById('practiceDailyPanel').classList.toggle('hidden',!daily);document.getElementById('practiceMonthlyPanel').classList.toggle('hidden',!monthly);document.getElementById('practiceEntryTab').classList.toggle('primary',entry);document.getElementById('practiceDailyTab').classList.toggle('primary',daily);document.getElementById('practiceMonthlyTab').classList.toggle('primary',monthly);if(!entry)renderMonth()}
 function saveReview(){const target=shiftISO(selectedDate(),-1),r=getRecord(target);r.comment=document.getElementById('reviewText').value;r.skipComment=false;practiceRecords[target]=r;document.getElementById('skipReview').checked=false;saveAll()}
-let speechRecognition=null,voiceListening=false,voiceStopRequested=false,voiceBaseText='',voiceSessionResults=[],voiceRestartTimer=null;
+let speechRecognition=null,voiceListening=false,voiceStopRequested=false,voiceBaseText='',voiceSessionResults=[];
 function voiceMessage(msg,listening=false){const el=document.getElementById('voiceStatus');el.textContent=msg;el.classList.toggle('listening',listening)}
 function startVoiceRecognition(SpeechRecognition){
   if(voiceStopRequested)return;
@@ -212,7 +212,7 @@ function startVoiceRecognition(SpeechRecognition){
     speechRecognition.continuous=true;
     speechRecognition.interimResults=false;
     voiceSessionResults=[];
-    speechRecognition.onstart=()=>{voiceListening=true;document.getElementById('voiceButton').textContent='🎙️ వింటోంది…';document.getElementById('voiceStopButton').classList.remove('hidden');voiceMessage('వింటోంది… మధ్యలో ఆగినా మైక్ కొనసాగుతుంది. పూర్తయ్యాక “ఆపండి” నొక్కండి.',true)};
+    speechRecognition.onstart=()=>{voiceListening=true;document.getElementById('voiceButton').textContent='🎙️ వింటోంది…';document.getElementById('voiceStopButton').classList.remove('hidden');voiceMessage('వింటోంది… మాటలు ఆగినప్పుడు బ్రౌజర్ వినడం ఆపవచ్చు. కొనసాగించడానికి “మళ్లీ వినండి” నొక్కండి; పూర్తయ్యాక “ఆపండి” నొక్కండి.',true)};
     speechRecognition.onresult=(event)=>{
       for(let i=0;i<event.results.length;i++){
         const result=event.results[i];
@@ -236,11 +236,11 @@ function startVoiceRecognition(SpeechRecognition){
       document.getElementById('reviewText').value=voiceBaseText;
       saveReview();
       if(!voiceStopRequested){
-        voiceMessage('మళ్లీ వినడానికి సిద్ధమవుతోంది… ఆపే వరకు కొనసాగుతుంది.',true);
-        if(voiceRestartTimer)clearTimeout(voiceRestartTimer);
-        voiceRestartTimer=setTimeout(()=>startVoiceRecognition(SpeechRecognition),350);
+        document.getElementById('voiceButton').textContent='🎙️ మళ్లీ వినండి';
+        document.getElementById('voiceStopButton').classList.remove('hidden');
+        voiceMessage('వినడం తాత్కాలికంగా ఆగింది. మళ్లీ వినడానికి “మళ్లీ వినండి” నొక్కండి. ఇప్పటికే గుర్తించిన వచనం భద్రంగా ఉంది.',false);
       }else{
-        document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';
+        document.getElementById('voiceButton').textContent='🎙️ మాట్లాడండి';
         document.getElementById('voiceStopButton').classList.add('hidden');
         voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');
       }
@@ -249,7 +249,8 @@ function startVoiceRecognition(SpeechRecognition){
   }catch(e){
     voiceListening=false;
     if(!voiceStopRequested){
-      voiceMessage('మైక్ మళ్లీ ప్రారంభం కాలేదు. “ఆపండి” నొక్కి, అవసరమైతే మళ్లీ ప్రయత్నించండి.',true);
+      document.getElementById('voiceButton').textContent='🎙️ మళ్లీ వినండి';
+      voiceMessage('మైక్ ప్రారంభం కాలేదు. మళ్లీ ప్రయత్నించడానికి “మళ్లీ వినండి” నొక్కండి; ముగించడానికి “ఆపండి” నొక్కండి.',false);
       document.getElementById('voiceStopButton').classList.remove('hidden');
     }else{
       document.getElementById('voiceStopButton').classList.add('hidden');
@@ -257,8 +258,8 @@ function startVoiceRecognition(SpeechRecognition){
     }
   }
 }
-function toggleVoiceInput(){if(voiceListening){stopVoiceInput();return}const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SpeechRecognition){voiceMessage('ఈ బ్రౌజర్‌లో నేరుగా వాయిస్ గుర్తింపు అందుబాటులో లేదు. కీబోర్డ్ మైక్‌ను ఉపయోగించండి.');return}if(document.getElementById('skipReview').checked){voiceMessage('ముందుగా వ్యాఖ్య రాయదలచుకోలేదు అనే ఎంపికను తీసివేయండి.');return}voiceStopRequested=false;voiceBaseText=document.getElementById('reviewText').value.trim();voiceSessionResults=[];startVoiceRecognition(SpeechRecognition)}
-function stopVoiceInput(){voiceStopRequested=true;if(voiceRestartTimer){clearTimeout(voiceRestartTimer);voiceRestartTimer=null}if(speechRecognition&&voiceListening){try{speechRecognition.stop()}catch(e){voiceListening=false;document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';document.getElementById('voiceStopButton').classList.add('hidden');voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');saveReview()}}else{voiceListening=false;document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';document.getElementById('voiceStopButton').classList.add('hidden');voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');saveReview()}}
+function toggleVoiceInput(){if(voiceListening){voiceMessage('వినడం కొనసాగుతోంది. ముగించడానికి “ఆపండి” నొక్కండి.',true);return}const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SpeechRecognition){voiceMessage('ఈ బ్రౌజర్‌లో నేరుగా వాయిస్ గుర్తింపు అందుబాటులో లేదు. కీబోర్డ్ మైక్‌ను ఉపయోగించండి.');return}if(document.getElementById('skipReview').checked){voiceMessage('ముందుగా వ్యాఖ్య రాయదలచుకోలేదు అనే ఎంపికను తీసివేయండి.');return}voiceStopRequested=false;voiceBaseText=document.getElementById('reviewText').value.trim();voiceSessionResults=[];startVoiceRecognition(SpeechRecognition)}
+function stopVoiceInput(){voiceStopRequested=true;if(speechRecognition&&voiceListening){try{speechRecognition.stop()}catch(e){voiceListening=false;document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';document.getElementById('voiceStopButton').classList.add('hidden');voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');saveReview()}}else{voiceListening=false;document.getElementById('voiceButton').textContent='🎙️ మళ్లీ మాట్లాడండి';document.getElementById('voiceStopButton').classList.add('hidden');voiceMessage('పూర్తయింది. అవసరమైతే సవరించి సేవ్ చేయండి.');saveReview()}}
 
 function toggleSkipReview(){const target=shiftISO(selectedDate(),-1),r=getRecord(target);r.skipComment=document.getElementById('skipReview').checked;if(r.skipComment){r.comment='';document.getElementById('reviewText').value='';document.getElementById('reviewText').disabled=true}else document.getElementById('reviewText').disabled=false;practiceRecords[target]=r;saveAll()}
 function renderMinuteLevel(){const el=document.getElementById('minutesLevel'),level=levelForMinutes(document.getElementById('practiceMinutes').value);if(!level){el.classList.add('hidden');el.innerHTML='';return}el.classList.remove('hidden');el.innerHTML=`<span class="symbol">${level.symbol}</span>${level.name}`}
